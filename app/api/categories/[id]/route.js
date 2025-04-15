@@ -1,4 +1,3 @@
-// app/api/categories/[id]/route.js
 import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
 
@@ -7,9 +6,10 @@ const prisma = new PrismaClient();
 export async function PUT(req, { params }) {
   const body = await req.json();
   const { name, limit } = body;
+  const id = await params.id;
 
   const updatedCategory = await prisma.category.update({
-    where: { id: parseInt(params.id) },
+    where: { id: parseInt(id) },
     data: { name, limit },
   });
 
@@ -17,9 +17,25 @@ export async function PUT(req, { params }) {
 }
 
 export async function DELETE(req, { params }) {
-  const deletedCategory = await prisma.category.delete({
-    where: { id: parseInt(params.id) },
-  });
+  const id = await params.id;
+  console.log('Deleting category with ID:', id);
+  
+  try {
+    // First delete all related expenses
+    await prisma.expense.deleteMany({
+      where: { categoryId: parseInt(id) },
+    });
 
-  return NextResponse.json({ message: 'Category deleted', deletedCategory });
+    // Then delete the category
+    const deletedCategory = await prisma.category.delete({
+      where: { id: parseInt(id) },
+    });
+
+    return NextResponse.json({ message: 'Category deleted', deletedCategory });
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Failed to delete category' },
+      { status: 500 }
+    );
+  }
 }

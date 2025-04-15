@@ -28,6 +28,8 @@ export async function POST(req) {
       })
     )
   );
+  console.log('User created:', user);
+  
 
   return NextResponse.json({ user });
 }

@@ -13,14 +13,7 @@ export async function POST(req) {
     include: { expenses: true },
   });
 
-  const totalSpent = category.expenses.reduce((sum, exp) => sum + exp.amount, 0);
 
-  if (totalSpent + amount > category.limit) {
-    return NextResponse.json(
-      { message: 'Limit exceeded!' },
-      { status: 400 }
-    );
-  }
 
   const expense = await prisma.expense.create({
     data: {

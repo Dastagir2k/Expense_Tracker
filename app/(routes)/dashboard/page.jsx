@@ -20,6 +20,7 @@ import {
   CalendarIcon,
   CreditCardIcon,
   DollarSignIcon,
+  IndianRupeeIcon,
   PieChartIcon,
   WalletIcon,
 } from "lucide-react"
@@ -31,11 +32,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import axios from "axios"
+import DashboardSkeleton from "@/app/_components/loading/DashboardSkeleton"
 
 // Colors for charts (Black and White Theme)
 const COLORS = ["#000000", "#555555", "#AAAAAA", "#CCCCCC", "#EEEEEE", "#FFFFFF"]
 
 export default function DashboardPage() {
+
   const [dashboardData, setDashboardData] = useState({
     totalSpent: 0,
     totalLimit: 0,
@@ -43,13 +46,17 @@ export default function DashboardPage() {
     categories: [],
   })
   const [timeframe, setTimeframe] = useState("month")
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const userId = localStorage.getItem("userId")
+    console.log("userId", userId);
+    
     axios
       .get(`/api/expense/summary?userId=${userId}`)
       .then((response) => {
         setDashboardData(response.data)
+        setIsLoading(false)
       })
       .catch((error) => {
         console.error("Error fetching dashboard data:", error)
@@ -89,6 +96,11 @@ export default function DashboardPage() {
   // Find the category with highest spending
   const highestSpendingCategory = [...dashboardData.categories].sort((a, b) => b.totalSpent - a.totalSpent)[0]
 
+
+
+  if (isLoading) {
+    return <DashboardSkeleton />
+  }
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8">
       <div className="flex items-center justify-between">
@@ -120,10 +132,10 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
-            <DollarSignIcon className="h-4 w-4 text-muted-foreground" />
+            <IndianRupeeIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${dashboardData.totalSpent.toLocaleString()}</div>
+            <div className="text-2xl font-bold flex py-2"><IndianRupeeIcon className="mt-1"/>{dashboardData.totalSpent.toLocaleString()}</div>
           </CardContent>
         </Card>
 
@@ -133,7 +145,7 @@ export default function DashboardPage() {
             <WalletIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${remainingBudget.toLocaleString()}</div>
+            <div className="text-2xl font-bold py-2 flex"><IndianRupeeIcon className="mt-1"/>{remainingBudget.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">{budgetUsedPercentage.toFixed(1)}% of total budget used</p>
           </CardContent>
         </Card>
@@ -145,8 +157,8 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{highestSpendingCategory?.name || "N/A"}</div>
-            <p className="text-xs text-muted-foreground">
-              ${highestSpendingCategory?.totalSpent?.toLocaleString() || 0} (
+            <p className="text-xs text-muted-foreground flex">
+              <IndianRupeeIcon size={20} className="font-bold"/>{highestSpendingCategory?.totalSpent?.toLocaleString() || 0} (
               {((highestSpendingCategory?.totalSpent / highestSpendingCategory?.limit) * 100 || 0).toFixed(1)}% of
               limit)
             </p>
@@ -174,33 +186,40 @@ export default function DashboardPage() {
         </TabsList>
 
         <TabsContent value="categories" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Budget vs. Spending by Category</CardTitle>
-              <CardDescription>Compare your spending against budget limits for each category</CardDescription>
-            </CardHeader>
-            <CardContent className="pl-2">
-              <div className="h-[400px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={categoryComparisonData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#CCCCCC" />
-                    <XAxis dataKey="name" stroke="#000000" />
-                    <YAxis stroke="#000000" />
-                    <Tooltip
-                      formatter={(value) => [`$${value}`, undefined]}
-                      labelFormatter={(label) => `Category: ${label}`}
-                      contentStyle={{ backgroundColor: "#FFFFFF", color: "#000000" }}
-                    />
-                    <Legend wrapperStyle={{ color: "#000000" }} />
-                    <Bar dataKey="spent" name="Amount Spent" fill="#555555" />
-                    <Bar dataKey="limit" name="Budget Limit" fill="#AAAAAA" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+  <Card>
+    <CardHeader>
+      <CardTitle>Budget vs. Spending by Category</CardTitle>
+      <CardDescription>Compare your spending against budget limits for each category</CardDescription>
+    </CardHeader>
+    <CardContent className="pl-2">
+      <div className="h-[400px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={categoryComparisonData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#CCCCCC" />
+            <XAxis dataKey="name" stroke="#000000" />
+            <YAxis stroke="#000000" />
+            <Tooltip
+              formatter={(value) => [
+                <span className="flex items-center">
+                  <IndianRupeeIcon className="h-4 w-4 mr-1" />
+                  {value.toLocaleString()}
+                </span>,
+                undefined
+              ]}
+              labelFormatter={(label) => `Category: ${label}`}
+              contentStyle={{ backgroundColor: "#FFFFFF", color: "#000000" }}
+            />
+            <Legend wrapperStyle={{ color: "#000000" }} />
+            <Bar dataKey="spent" name="Amount Spent" fill="#555555" />
+            <Bar dataKey="limit" name="Budget Limit" fill="#AAAAAA" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </CardContent>
+  </Card>
+</TabsContent>
 
+        {/* Spending Distribution Chart */}
         <TabsContent value="spending" className="space-y-4">
           <Card>
             <CardHeader>
@@ -237,6 +256,7 @@ export default function DashboardPage() {
           </Card>
         </TabsContent>
 
+        {/* Detailed Breakdown of Expenses */}
         <TabsContent value="details" className="space-y-4">
           <Card>
             <CardHeader>
@@ -254,12 +274,12 @@ export default function DashboardPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {dashboardData.categories.map((category, index) => (
+                  {dashboardData.categories.reverse().map((category, index) => (
                     <TableRow key={category.id || index}>
                       <TableCell>{category.name}</TableCell>
-                      <TableCell>${category.totalSpent.toLocaleString()}</TableCell>
-                      <TableCell>${category.limit.toLocaleString()}</TableCell>
-                      <TableCell>${(category.limit - category.totalSpent).toLocaleString()}</TableCell>
+                      <TableCell>{category.totalSpent.toLocaleString()}</TableCell>
+                      <TableCell>{category.limit.toLocaleString()}</TableCell>
+                      <TableCell>{(category.limit - category.totalSpent).toLocaleString()}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

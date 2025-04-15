@@ -1,52 +1,59 @@
 "use client"
 
-
-
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Eye, EyeOff } from "lucide-react"
+import { useRouter } from "next/navigation"
+import axios from "axios"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import axios from "axios"
+import { toast } from "sonner"
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const router = useRouter()
+  const [formData, setFormData] = useState({
+    email: "",
+    password: ""
+  })
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simulate API call
     try {
-        localStorage.clear()
-        axios.post("/api/auth/login", {
-        email,
-        password,
-        }).then((response) => {
-            console.log(response.data) // Handle successful login response
-      localStorage.setItem("userId",response.data.id) // Simulate JWT token storage	
+      const response = await axios.post("/api/auth/login", formData)
 
-            }
-        ).catch((error) => {
-            console.error(error) // Handle error response
-        }
-    )
+      if (response.data.success) {
+        // Store user data (not the token - it's in HTTP-only cookie)
+        localStorage.setItem("userId", response.data.user.id)
+        localStorage.setItem("userEmail", response.data.user.email)
+
+        // Show success message
+        toast.success("Login successful!")
+        console.log("Login successful:", response.data.user);
         
-      // In a real app, you would call your authentication API here
-      localStorage.setItem("user", JSON.stringify({ email }))
-    //   localStorage.setItem("userId",response.data.id) // Simulate JWT token storage	
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      // Redirect to dashboard on successful login
-      window.location.href = "/dashboard"
+        // Redirect to dashboard
+        window.location.href = "/dashboard"
+        // router.push("/dashboard")
+        router.refresh()
+      }
     } catch (error) {
-      console.error("Login failed:", error)
+      console.error("Login error:", error)
+      toast.error(error.response?.data?.error || "Login failed. Please try again.")
     } finally {
       setIsLoading(false)
     }
@@ -79,7 +86,9 @@ export default function LoginPage() {
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>
-            <CardDescription className="text-center">Enter your credentials to access your account</CardDescription>
+            <CardDescription className="text-center">
+              Enter your credentials to access your account
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -87,11 +96,13 @@ export default function LoginPage() {
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   placeholder="name@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={formData.email}
+                  onChange={handleChange}
                   required
+                  disabled={isLoading}
                 />
               </div>
               <div className="space-y-2">
@@ -104,11 +115,13 @@ export default function LoginPage() {
                 <div className="relative">
                   <Input
                     id="password"
+                    name="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={formData.password}
+                    onChange={handleChange}
                     required
+                    disabled={isLoading}
                   />
                   <Button
                     type="button"
@@ -118,7 +131,9 @@ export default function LoginPage() {
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
+                    <span className="sr-only">
+                      {showPassword ? "Hide password" : "Show password"}
+                    </span>
                   </Button>
                 </div>
               </div>

@@ -19,7 +19,7 @@ export async function GET(req) {
   const userId = parseInt(searchParams.get('userId'));
 
   const categories = await prisma.category.findMany({
-    where: { userId: userId }, // replace with actual userId
+    where: { userId: parseInt(userId) }, // replace with actual userId
     include: {
       expenses: true,
     },
