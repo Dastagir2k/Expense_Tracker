@@ -171,17 +171,10 @@ Get expense summary for user.
 
 ## 🛠️ Running the App
 
-### Backend (NestJS)
-```bash
-cd backend
-npm install
-npx prisma migrate dev
-npm run start:dev
-```
 
-### Frontend (Next.js)
+
+### Fulstack (Next.js)
 ```bash
-cd frontend
 npm install
 npm run dev
 ```
