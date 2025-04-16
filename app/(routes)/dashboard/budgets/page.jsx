@@ -417,12 +417,7 @@ export default function BudgetPage() {
                         <DialogDescription>Record a new expense for this category.</DialogDescription>
                       </DialogHeader>
                       <div className="grid gap-4 py-4">
-                        {/* {errorMessage && (
-                          <div className="flex items-center text-red-500 p-3 bg-red-50 rounded-md">
-                            <AlertTriangle className="h-4 w-4 mr-2" />
-                            <span>{errorMessage}</span>
-                          </div>
-                        )} */}
+                       
                         <div className="grid grid-cols-4 items-center gap-4">
                           <Label htmlFor="amount" className="text-right">
                             Amount ($)

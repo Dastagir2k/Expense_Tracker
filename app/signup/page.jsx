@@ -52,20 +52,20 @@ export default function SignupPage() {
       return
     }
 
-    setIsLoading(true)
-
+    
     // Simulate API call
     try {
-        axios.post("/api/auth/signup", {
+      axios.post("/api/auth/signup", {
         email,
         password,
-        }).then((response) => {
+      }).then((response) => {
+          
             console.log(response.data);
         }
         ).catch((error) => {
             console.error(error.response.data);
         }
-    )
+        )
 
       // In a real app, you would call your registration API here
       await new Promise((resolve) => setTimeout(resolve, 1000))
@@ -74,7 +74,7 @@ export default function SignupPage() {
     } catch (error) {
       console.error("Signup failed:", error)
     } finally {
-      setIsLoading(false)
+      setIsLoading(true)
     }
   }
 

@@ -1,28 +1,44 @@
 import { NextResponse } from 'next/server';
-import { verifyJWT } from './lib/jwt';
+import jwt from 'jsonwebtoken';
+
+
+const JWT_SECRET = process.env.JWT_SECRET || "key is always secret rule @969" ;
+
+
+ function verifyJWT(token) {
+  try {
+      console.log('Token verified:',jwt.verify(token, JWT_SECRET) ); // Debug logging
+    return jwt.verify(token, JWT_SECRET);
+    
+  } catch (error) {
+    return null;
+  }
+}
+
 
 export async function middleware(request) {
   // Get token from cookies
   const token = request.cookies.get('token')?.value;
+  console.log('Token:', token); // Debug logging
 
   // Protected routes that require authentication
-  const protectedPaths = ['/dashboard', '/expenses', '/categories'];
+  const protectedPaths = ['/dashboard', '/dashboard/expenses', '/dashboard/categories'];
   const isProtectedPath = protectedPaths.some(path => 
     request.nextUrl.pathname.startsWith(path)
   );
 
   if (isProtectedPath) {
     if (!token) {
+        // Token is missing, redirect to login page
       return NextResponse.redirect(new URL('/login', request.url));
     }
-
+    console.log('Token exists:', token); // Debug logging
+    
     const payload = verifyJWT(token);
-    if (!payload) {
-      // Clear invalid token and redirect to login
-      const response = NextResponse.redirect(new URL('/login', request.url));
-      response.cookies.delete('token');
-      return response;
-    }
+    console.log('Payload:', payload); // Debug logging
+    
+    // if (!payload) {
+
   }
 
   return NextResponse.next();
