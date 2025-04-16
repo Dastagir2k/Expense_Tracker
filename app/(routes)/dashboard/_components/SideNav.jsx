@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { LayoutGrid, LogOutIcon, PiggyBank, ReceiptText } from 'lucide-react'
+import { BrainCircuit, LayoutGrid, LogOutIcon, PiggyBank, ReceiptText } from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,7 +40,13 @@ function SideNav() {
       name: "Expenses",
       icon: ReceiptText,
       path: "/dashboard/expenses"
-    }
+    },
+    {
+      id: 4,
+      name: "Insights",
+      icon: BrainCircuit,
+      path: "/dashboard/insights"
+    },
   ]
 
   const handleLogout = async () => {
@@ -55,7 +61,7 @@ function SideNav() {
       
    
         localStorage.removeItem('user');
-        router.push('/login');
+       window.location.href = '/login';
       
     } catch (error) {
       console.error('Logout failed:', error);

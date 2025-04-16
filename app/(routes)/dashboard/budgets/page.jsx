@@ -32,13 +32,6 @@ import axios from "axios"
 import BudgetCardSkeleton from "@/app/_components/loading/BudgetCardSkeleton"
 
 
-
-
-
-
-
-
-
 export default function BudgetPage() {
   // Initial default categories
   const [categories, setCategories] = useState([])
@@ -46,7 +39,7 @@ export default function BudgetPage() {
   // Add this near your other state declarations
   const [isLoading, setIsLoading] = useState(true)
 
-  // Modify your useEffect to handle loading state
+  
   useEffect(() => {
     const userId = localStorage.getItem("userId")
     setUserId(userId)
@@ -105,7 +98,7 @@ export default function BudgetPage() {
       axios.post("/api/expense", {
         amount: newExpense.amount,
         note: newExpense.description,
-        categoryId: selectedCategoryId,
+        categoryId: parseInt(selectedCategoryId),
         userId: parseInt(userId),
       }).then((response) => {
         

@@ -23,25 +23,22 @@ function Main() {
                                      </p>
                                  </div>
                                  <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                                     <Button className="bg-emerald-900 hover:bg-emerald-700">
+                                    <a href="/signup">
+                                    <Button className="bg-emerald-900 hover:bg-emerald-700">
                                          
-                                             Start for Free
-                                             <ChevronRight className="ml-2 h-4 w-4" />
-                                        
-                                     </Button>
-                                     <Button variant="outline" size="lg">
-                                         Explore Features
-                                     </Button>
+                                         Start for Free
+                                         <ChevronRight className="ml-2 h-4 w-4" />
+                                    
+                                 </Button>
+                                 </a>
+                                    
                                  </div>
                                  <div className="flex items-center gap-4 text-sm">
                                      <div className="flex items-center gap-1">
                                          <CheckCircle className="h-4 w-4 text-emerald-500" />
                                          <span>No credit card required</span>
                                      </div>
-                                     <div className="flex items-center gap-1">
-                                         <CheckCircle className="h-4 w-4 text-emerald-500" />
-                                         <span>Free 14-day trial</span>
-                                     </div>
+                                    
                                  </div>
                              </div>
                              <div className="flex items-center justify-center">

@@ -10,6 +10,7 @@ generator client {
 model User {
   id         Int        @id @default(autoincrement())
   email      String     @unique
+  name       String
   password   String
   categories Category[]
   expenses   Expense[]

@@ -1,91 +1,91 @@
-"use client"
-import { useState, useEffect } from "react"
-import { PlusCircle, Search, Trash2, IndianRupeeIcon } from "lucide-react"
-import Link from "next/link"
+"use client";
+import { useState, useEffect } from "react";
+import { PlusCircle, Search, Trash2, IndianRupeeIcon } from "lucide-react";
+import Link from "next/link";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function ExpensesPage() {
-  const [categories, setCategories] = useState([])
-  const [searchTerm, setSearchTerm] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(5)
+  const [categories, setCategories] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId")
+    const userId = localStorage.getItem("userId");
     if (userId) {
       fetch(`/api/categories?userId=${userId}`)
         .then(res => res.json())
         .then(data => setCategories(data))
-        .catch(err => console.error("Error fetching categories:", err))
+        .catch(err => console.error("Error fetching categories:", err));
     }
-  }, [])
+  }, []);
 
   const allExpenses = categories.flatMap(category => 
     category.expenses.map(expense => ({
       ...expense,
       categoryName: category.name
     }))
-  )
+  );
 
   const filteredExpenses = allExpenses.filter(expense => 
-    expense.note.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    expense.categoryName.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+    (expense.note && expense.note.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (expense.categoryName && expense.categoryName.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
   // Pagination calculations
-  const totalPages = Math.ceil(filteredExpenses.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const currentExpenses = filteredExpenses.slice(startIndex, startIndex + itemsPerPage)
+  const totalPages = Math.ceil(filteredExpenses.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentExpenses = filteredExpenses.slice(startIndex, startIndex + itemsPerPage);
 
   const deleteExpense = async (id) => {
     try {
       await fetch(`/api/expense/${id}`, {
         method: 'DELETE',
-      })
-      const userId = localStorage.getItem("userId")
-      const response = await fetch(`/api/categories?userId=${userId}`)
-      const data = await response.json()
-      setCategories(data)
+      });
+      const userId = localStorage.getItem("userId");
+      const response = await fetch(`/api/categories?userId=${userId}`);
+      const data = await response.json();
+      setCategories(data);
     } catch (error) {
-      console.error("Error deleting expense:", error)
+      console.error("Error deleting expense:", error);
     }
-  }
+  };
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1)
+      setCurrentPage(currentPage + 1);
     }
-  }
+  };
   
   const handlePreviousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1)
+      setCurrentPage(currentPage - 1);
     }
-  }
+  };
 
   const handlePageClick = (pageNumber) => {
-    setCurrentPage(pageNumber)
-  }
+    setCurrentPage(pageNumber);
+  };
 
   const getPageNumbers = () => {
-    const pageNumbers = []
-    const maxVisiblePages = 5
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2))
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1)
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
     if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1)
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
 
     for (let i = startPage; i <= endPage; i++) {
-      pageNumbers.push(i)
+      pageNumbers.push(i);
     }
-    return pageNumbers
-  }
+    return pageNumbers;
+  };
 
   return (
     <div className="container mx-auto py-10 space-y-6 px-10">
@@ -161,62 +161,62 @@ export default function ExpensesPage() {
           </div>
         </CardContent>
         <div className="flex justify-between items-center p-4">
-      <Button 
-        variant="outline" 
-        onClick={handlePreviousPage} 
-        disabled={currentPage === 1}
-      >
-        Previous
-      </Button>
-      <div className="flex gap-2">
-        {currentPage > 3 && (
-          <>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handlePageClick(1)}
-            >
-              1
-            </Button>
-            {currentPage > 4 && (
-              <span className="px-2 py-2">...</span>
-            )}
-          </>
-        )}
-        {getPageNumbers().map((pageNumber) => (
-          <Button
-            key={pageNumber}
-            variant={currentPage === pageNumber ? "default" : "outline"}
-            size="sm"
-            onClick={() => handlePageClick(pageNumber)}
+          <Button 
+            variant="outline" 
+            onClick={handlePreviousPage} 
+            disabled={currentPage === 1}
           >
-            {pageNumber}
+            Previous
           </Button>
-        ))}
-        {currentPage < totalPages - 2 && (
-          <>
-            {currentPage < totalPages - 3 && (
-              <span className="px-2 py-2">...</span>
+          <div className="flex gap-2">
+            {currentPage > 3 && (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageClick(1)}
+                >
+                  1
+                </Button>
+                {currentPage > 4 && (
+                  <span className="px-2 py-2">...</span>
+                )}
+              </>
             )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handlePageClick(totalPages)}
-            >
-              {totalPages}
-            </Button>
-          </>
-        )}
-      </div>
-      <Button 
-        variant="outline" 
-        onClick={handleNextPage} 
-        disabled={currentPage === totalPages}
-      >
-        Next
-      </Button>
-    </div>
+            {getPageNumbers().map((pageNumber) => (
+              <Button
+                key={pageNumber}
+                variant={currentPage === pageNumber ? "default" : "outline"}
+                size="sm"
+                onClick={() => handlePageClick(pageNumber)}
+              >
+                {pageNumber}
+              </Button>
+            ))}
+            {currentPage < totalPages - 2 && (
+              <>
+                {currentPage < totalPages - 3 && (
+                  <span className="px-2 py-2">...</span>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageClick(totalPages)}
+                >
+                  {totalPages}
+                </Button>
+              </>
+            )}
+          </div>
+          <Button 
+            variant="outline" 
+            onClick={handleNextPage} 
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </Button>
+        </div>
       </Card>
     </div>
-  )
+  );
 }

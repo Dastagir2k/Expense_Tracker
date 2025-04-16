@@ -65,7 +65,7 @@ export default function LoginPage() {
       <div className="flex-1 bg-muted hidden md:flex items-center justify-center p-10">
         <div className="max-w-md">
           <Image
-            src="/placeholder.svg?height=600&width=600"
+            src="/login.jpg"
             alt="Expense Tracker Illustration"
             width={600}
             height={600}

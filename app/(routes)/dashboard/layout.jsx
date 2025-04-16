@@ -11,7 +11,7 @@ function DashboardLayout({children}) {
           <SideNav/>
         </div>
         <div className="md:ml-64">
-          <Dashboardheader/>
+      
           {children}
         </div>
       </div>

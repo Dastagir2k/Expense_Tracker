@@ -27,19 +27,15 @@ export async function middleware(request) {
     request.nextUrl.pathname.startsWith(path)
   );
 
-  if (isProtectedPath) {
-    if (!token) {
-        // Token is missing, redirect to login page
-      return NextResponse.redirect(new URL('/login', request.url));
-    }
+  if(isProtectedPath && !token) {
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
     console.log('Token exists:', token); // Debug logging
-    
+        
     const payload = verifyJWT(token);
     console.log('Payload:', payload); // Debug logging
-    
-    // if (!payload) {
-
-  }
+ 
 
   return NextResponse.next();
 }
